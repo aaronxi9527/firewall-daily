@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>防火墙日报 · 2026-06-05</title>
+<style>
+:root {
+    --bg: #0a0a0a;
+    --surface: #111114;
+    --surface2: #1a1a1f;
+    --border: #26262b;
+    --text: #e4e4e7;
+    --text2: #a1a1aa;
+    --text3: #71717a;
+    --accent1: #5B6CF7;
+    --accent2: #8B5CF6;
+    --accent3: #EC4899;
+    --danger: #ef4444;
+    --orange: #f59e0b;
+    --green: #10b981;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+/* ===== 顶栏 ===== */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,10,0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+    font-size: 15px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent1), var(--accent3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.nav-date { font-size: 13px; color: var(--text3); }
+
+/* ===== Hero ===== */
+.hero {
+    margin-top: 52px;
+    padding: 48px 24px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+.hero h1 {
+    font-size: 42px; font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    position: relative;
+}
+.hero .subtitle {
+    margin-top: 10px; color: var(--text2); font-size: 15px;
+}
+.hero .decor {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.12;
+    pointer-events: none;
+}
+.hero .decor:nth-child(3) { width: 80px; height: 80px; background: var(--accent1); top: 20px; right: 15%; animation: float 6s ease-in-out infinite; }
+.hero .decor:nth-child(4) { width: 50px; height: 50px; background: var(--accent3); bottom: 30px; left: 10%; animation: float 8s ease-in-out infinite 1s; }
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-16px); }
+}
+
+/* ===== 统计卡片 ===== */
+.stats-row {
+    display: flex; justify-content: center; gap: 16px;
+    padding: 0 24px 32px; flex-wrap: wrap;
+}
+.stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 24px; text-align: center;
+    min-width: 120px;
+}
+.stat-card .num {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.stat-card .label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+/* ===== AI 解读 ===== */
+.ai-read {
+    margin: 0 24px 32px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(91,108,247,0.06), rgba(139,92,246,0.06));
+    border: 1px solid rgba(139,92,246,0.18);
+    border-radius: 16px;
+}
+.ai-read h3 {
+    font-size: 14px; font-weight: 700; color: var(--accent2);
+    margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;
+}
+.ai-read p { color: var(--text2); font-size: 14px; line-height: 1.8; }
+
+/* ===== 卡片网格 ===== */
+.container { max-width: 900px; margin: 0 auto; padding: 0 24px 64px; }
+.section-title {
+    font-size: 13px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 32px 0 16px;
+}
+.card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+    opacity: 0; transform: translateY(16px);
+}
+.card.visible { opacity: 1; transform: translateY(0); transition: opacity 0.5s, transform 0.5s; }
+.card:hover { border-color: rgba(139,92,246,0.25); }
+.card:hover .card-index { color: var(--accent2); }
+.card-header {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 8px;
+}
+.card-index {
+    font-size: 13px; font-weight: 800; color: var(--text3);
+    min-width: 24px; transition: color 0.2s;
+}
+.card-title {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    line-height: 1.4; flex: 1;
+}
+.card-tags { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.tag {
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 10px; font-weight: 500;
+}
+.tag-vuln { background: rgba(239,68,68,0.15); color: var(--danger); }
+.tag-event { background: rgba(245,158,11,0.15); color: var(--orange); }
+.tag-trend { background: rgba(16,185,129,0.15); color: var(--green); }
+.tag-competitor { background: rgba(139,92,246,0.15); color: var(--accent2); }
+
+.card-summary { font-size: 13px; color: var(--text2); line-height: 1.65; margin: 8px 0; }
+.card-meta {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    font-size: 12px; color: var(--text3);
+}
+.source-chip {
+    display: inline-block;
+    background: rgba(91,108,247,0.12);
+    color: var(--accent1);
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.source-chip:hover { background: rgba(91,108,247,0.22); }
+.merge-badge {
+    background: rgba(236,72,153,0.12);
+    color: var(--accent3);
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.card-time { margin-left: auto; }
+
+/* ===== 页脚 ===== */
+.footer {
+    text-align: center; padding: 32px 24px 48px;
+    font-size: 12px; color: var(--text3);
+    border-top: 1px solid var(--border);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 36px 16px 24px; }
+    .container { padding: 0 12px 48px; }
+    .card { padding: 16px 18px; }
+    .stat-card { min-width: 90px; padding: 12px 16px; }
+    .stat-card .num { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+    <span class="nav-logo">🛡 防火墙日报</span>
+    <span class="nav-date">2026.06.05 · Friday</span>
+</nav>
+
+<section class="hero">
+    <div class="decor"></div>
+    <div class="decor"></div>
+    <h1>防火墙产业日报</h1>
+    <div class="subtitle">网络安全攻防前沿 · 市场格局 · 竞品态势 · 漏洞预警</div>
+</section>
+
+<div class="stats-row">
+    <div class="stat-card"><div class="num">10</div><div class="label">精选动态</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="label">漏洞预警</div></div>
+    <div class="stat-card"><div class="num">5</div><div class="label">竞品/趋势</div></div>
+    <div class="stat-card"><div class="num">1</div><div class="label">行业大会</div></div>
+</div>
+
+<div class="ai-read">
+    <h3>🔍 AI 研判</h3>
+    <p>本周核心看点：<b>BCS 2026</b>（6月2日）释放强烈信号——AI安全已从概念进入实战，齐向东'三位一体'安全体系与比亚迪Mythos<27秒攻破防线>的数据标志着攻击方已全面工业化。防火墙厂商需关注两大方向：<b>抗量子加密</b>（山石已率先落地NIST PQC标准，绿盟暂缺）与<b>AI-NGFW融合</b>（Gartner 2026趋势点名）。漏洞侧需警惕Fortinet系列漏洞（CVE-2026-35616 CVSS 9.1在野利用），FortiGate系列攻击事件波及关键基础设施。</p>
+</div>
+
+<div class="container">
+    <div class="section-title">📋 今日动态</div>
+    
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#1</span>
+            <div>
+                <div class="card-title">BCS 2026：'AI时代，攻防先行'，第八届北京网络安全大会开幕</div>
+                <div class="card-tags"><span class="tag tag-event">行业会议</span><span class="tag tag-event">AI安全</span></div>
+            </div>
+        </div>
+        <div class="card-summary">6月2日北京国家会议中心，发布高安全机器人、AI智能体产业图谱等多项成果。齐向东提出'三个攻防失衡'与'三位一体'安全体系（低位全栈AI化产品-中位智能体-高位大模型底座）；比亚迪罗小平披露Mythos大模型将突破防线时间压缩至27秒，防御进入'以AI对抗AI'阶段。</div>
+        <div class="card-meta">
+            <a href="https://news.qq.com/rain/a/20260602A09OAD00" target="_blank" class="source-chip">腾讯新闻</a><a href="https://www.workercn.cn/c/2026-06-03/8815739.shtml" target="_blank" class="source-chip">工人日报</a> <span class="merge-badge">合并2源</span>
+            <span class="card-time">2026-06-02</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#2</span>
+            <div>
+                <div class="card-title">Fortinet FortiClient EMS 0-Day 漏洞在野利用（CVE-2026-35616, CVSS 9.1）</div>
+                <div class="card-tags"><span class="tag tag-vuln">漏洞预警</span><span class="tag tag-event">Fortinet</span></div>
+            </div>
+        </div>
+        <div class="card-summary">CISA 4月7日紧急预警，FortiClient EMS 存在不当访问控制漏洞，已被在野利用。评分为严重级 9.1，Fortinet 已发布紧急补丁。所有使用该产品防火墙用户需立即升级。</div>
+        <div class="card-meta">
+            <a href="https://www.tenable.com/blog/cve-2026-35616-fortinet-forticlientems-improper-access-control-vulnerability-exploited-in-the" target="_blank" class="source-chip">Tenable Blog</a><a href="https://watchtowr.com/resources/fortinet-forticlient-ems-zero-day-cve-2026-35616-active-exploitation-underway/" target="_blank" class="source-chip">watchTowr</a> <span class="merge-badge">合并2源</span>
+            <span class="card-time">2026-04-07</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#3</span>
+            <div>
+                <div class="card-title">FortiGate 防火墙遭大规模定向攻击，2026年初系列入侵活动披露</div>
+                <div class="card-tags"><span class="tag tag-vuln">攻击事件</span><span class="tag tag-event">FortiGate</span></div>
+            </div>
+        </div>
+        <div class="card-summary">2026年初，威胁行为者针对 FortiGate NGFW 发起一系列入侵攻击，利用多个已知漏洞进行初始访问并横向移动。事件波及多国关键基础设施，CISA 已发布联合预警。</div>
+        <div class="card-meta">
+            <a href="https://gbhackers.com/cisa-alerts-exploited-fortinet-zero-day-vulnerability/" target="_blank" class="source-chip">GBHackers</a>
+            <span class="card-time">2026-03-15</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#4</span>
+            <div>
+                <div class="card-title">Forcepoint NGFW 本地提权漏洞披露（CVE-2025-12690）</div>
+                <div class="card-tags"><span class="tag tag-vuln">漏洞预警</span><span class="tag tag-event">Forcepoint</span></div>
+            </div>
+        </div>
+        <div class="card-summary">阿里云漏洞库披露 Forcepoint NGFW Engine 存在本地提权漏洞。该引擎用于网络流量过滤和威胁检测，漏洞影响安全引擎核心组件。厂商已发布修复版本，建议升级至最新引擎。</div>
+        <div class="card-meta">
+            <a href="https://avd.aliyun.com/detail?id=AVD-2025-12690" target="_blank" class="source-chip">阿里云AVD</a><a href="https://app.opencve.io/cve/?vendor=forcepoint" target="_blank" class="source-chip">OpenCVE</a> <span class="merge-badge">合并2源</span>
+            <span class="card-time">2026-03-12</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#5</span>
+            <div>
+                <div class="card-title">ePati Antikor NGFW 认证绕过漏洞（CVE-2026-2624）</div>
+                <div class="card-tags"><span class="tag tag-vuln">漏洞预警</span><span class="tag tag-vuln">认证绕过</span></div>
+            </div>
+        </div>
+        <div class="card-summary">ePati Antikor 下一代防火墙存在关键功能缺少认证漏洞，攻击者无需凭证即可访问受保护功能。CVSS 评分待定，但漏洞性质严重——认证缺失属于防火墙产品的致命缺陷。</div>
+        <div class="card-meta">
+            <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-2624" target="_blank" class="source-chip">NVD</a><a href="https://cvefeed.io/vuln/detail/CVE-2026-2624" target="_blank" class="source-chip">CVEFeed</a> <span class="merge-badge">合并2源</span>
+            <span class="card-time">2026-02-25</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#6</span>
+            <div>
+                <div class="card-title">Gartner 发布2026年六大网络安全趋势：AI、地缘政治、供应链安全</div>
+                <div class="card-tags"><span class="tag tag-trend">行业趋势</span><span class="tag tag-event">Gartner</span></div>
+            </div>
+        </div>
+        <div class="card-summary">Gartner 权威发布：AI驱动的攻防对抗、地缘政治紧张局势和监管不确定性成为驱动网络安全变革的三驾马车。技术融合、供应链安全重塑、零信任规模化部署成为年度关键议题。防火墙厂商需关注AI-NGFW融合趋势。</div>
+        <div class="card-meta">
+            <a href="https://cloud.tencent.com/developer/article/2640008" target="_blank" class="source-chip">腾讯云开发者</a>
+            <span class="card-time">2026-03-16</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#7</span>
+            <div>
+                <div class="card-title">2026年中国防火墙市场格局：华为28%领跑，深信服毛利率最高79%</div>
+                <div class="card-tags"><span class="tag tag-trend">市场格局</span><span class="tag tag-competitor">竞品分析</span></div>
+            </div>
+        </div>
+        <div class="card-summary">IDC 2025Q1数据：华为28%、新华三22%、天融信15%、迪普科技10%、绿盟科技3%。深信服网络安全业务毛利率79.31%居行业首位，山石网科71.97%。Q1 中国数据中心NGFW市场五家头部企业营收合计43.3亿元。</div>
+        <div class="card-meta">
+            <a href="https://wenku.baidu.com/view/82b81cd6bcf67c1cfad6195f312b3169a451eac0.html" target="_blank" class="source-chip">百度文库</a><a href="https://baijiahao.baidu.com/s?id=1856250051650928216" target="_blank" class="source-chip">智研咨询</a><a href="https://www.docin.com/p-4969866814.html" target="_blank" class="source-chip">豆丁网</a> <span class="merge-badge">合并3源</span>
+            <span class="card-time">2026-02-05</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#8</span>
+            <div>
+                <div class="card-title">深信服防火墙2025年深度评测：SASE融合+AI安全，防护效果领先</div>
+                <div class="card-tags"><span class="tag tag-competitor">竞品动态</span><span class="tag tag-event">深信服</span></div>
+            </div>
+        </div>
+        <div class="card-summary">深信服下一代防火墙与SASE深度融合，云端订阅灵活扩展防入侵、防银狐等防护能力。延伸SD-WAN分支组网、GA全球加速场景，实现办公安全与组网一体化。AI安全引擎持续迭代。</div>
+        <div class="card-meta">
+            <a href="https://www.ithome.com/0/900/658.htm" target="_blank" class="source-chip">IT之家</a><a href="https://finance.sina.com.cn/roll/2025-11-24/doc-infynvve3910604.shtml" target="_blank" class="source-chip">新浪财经</a> <span class="merge-badge">合并2源</span>
+            <span class="card-time">2026-01-23</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#9</span>
+            <div>
+                <div class="card-title">山石网科抗量子防火墙正式发布：NIST PQC标准首个防火墙落地产品</div>
+                <div class="card-tags"><span class="tag tag-event">产品创新</span><span class="tag tag-event">山石网科</span><span class="tag tag-event">抗量子</span></div>
+            </div>
+        </div>
+        <div class="card-summary">山石网科推出业界首款抗量子防火墙，采用FIPS 203/204/205标准（ML-KEM、ML-DSA、SLH-DSA），基于格密码算法体系。支持算法可插拔、软件升级切换，配套ASIC芯片在研。解决'先存储后解密'回溯攻击威胁，面向政务/金融/能源行业。</div>
+        <div class="card-meta">
+            <a href="http://jjckb.xinhuanet.com/20260413/30d355f82f7340849c4208087dde1d24/c.html" target="_blank" class="source-chip">经济参考报</a>
+            <span class="card-time">2026-04-13</span>
+        </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-index">#10</span>
+            <div>
+                <div class="card-title">奇安信与云迹科技联合发布高安全机器人，进军政务/能源/金融安防</div>
+                <div class="card-tags"><span class="tag tag-event">安全产品</span><span class="tag tag-event">奇安信</span></div>
+            </div>
+        </div>
+        <div class="card-summary">BCS 2026上，奇安信联合云迹科技发布面向高安全场景的服务机器人产品，标志着服务机器人从酒店楼宇向政务、能源、金融、城市安防等复杂业务现场迈进。安全芯片+可信执行环境加持。</div>
+        <div class="card-meta">
+            <a href="https://news.qq.com/rain/a/20260602A09OAD00" target="_blank" class="source-chip">腾讯新闻</a>
+            <span class="card-time">2026-06-02</span>
+        </div>
+    </div>
+    
+</div>
+
+<footer class="footer">
+    <p>防火墙日报 · 自动生成 · 2026-06-05</p>
+    <p style="margin-top:6px;">数据来源：公开网络安全资讯 · AI 研判仅供参考</p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (e.isIntersecting) { e.target.classList.add('visible'); }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.card').forEach(function(c) { observer.observe(c); });
+    // Trigger visible for cards in viewport on load
+    setTimeout(function() {
+        document.querySelectorAll('.card').forEach(function(c) {
+            var r = c.getBoundingClientRect();
+            if (r.top < window.innerHeight) c.classList.add('visible');
+        });
+    }, 100);
+});
+</script>
+</body>
+</html>
